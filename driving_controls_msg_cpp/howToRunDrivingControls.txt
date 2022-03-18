@@ -1,0 +1,9 @@
+1. in catkin_ws 
+    $ catkin_make
+    $ source devel/setup.bash
+2. new terminal
+    $roscore
+3. in catkin_ws
+    $ rosrun driving_controls_msg_cpp driving_controls_pub
+4. new terminal
+    $ rosrun driving_controls_msg_cpp driving_controls_sub
