@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<package>
+<package format="2">
   <name>rplidar_ros</name>
   <version>1.10.0</version>
   <description>The rplidar ros package, support rplidar A2/A1 and A3/S1</description>
@@ -12,9 +12,16 @@
   <build_depend>rosconsole</build_depend>
   <build_depend>sensor_msgs</build_depend>
   <build_depend>std_srvs</build_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>rosconsole</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>std_srvs</run_depend>
-
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>rosconsole</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
 </package>

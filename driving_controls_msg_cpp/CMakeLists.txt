@@ -34,7 +34,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## * In the file package.xml:
 ##   * add a build_depend tag for "message_generation"
 ##   * add a build_depend and a exec_depend tag for each package in MSG_DEP_SET
-##   * If MSG_DEP_SET isn't empty the following dependency has been pulled in
+##   * If MSG_DEP_SET isn't empty the following depen0
+## dency has been pulled in
 ##     but can be declared for certainty nonetheless:
 ##     * add a exec_depend tag for "message_runtime"
 ## * In this file (CMakeLists.txt):
@@ -141,7 +142,6 @@ target_link_libraries(driving_controls_lib i2c)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(driving_controls_pub src/driving_controls_pub.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -151,6 +151,7 @@ add_executable(driving_controls_pub src/driving_controls_pub.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
+add_executable(driving_controls_pub src/driving_controls_pub.cpp)
 add_dependencies(driving_controls_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against

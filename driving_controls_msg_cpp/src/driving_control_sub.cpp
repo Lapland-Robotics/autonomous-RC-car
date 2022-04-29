@@ -11,7 +11,6 @@
 #include <JHPWMPCA9685.h>
 
 using namespace std;
-
 // servo pwm board pin 0
 // ESC pwm board pin 1
 
@@ -56,8 +55,8 @@ void setValues(const driving_controls_msg_cpp::driving_controls &msg)
     if (msg.speed < 410 && msg.speed > 205 && msg.steering > 265 && msg.steering < 376)
     {
         cout << "valid" << endl;
-        pca9685->setPWM(1, 0, msg.speed);
-        pca9685->setPWM(0, 0, msg.steering);
+        pca9685->setPWM(0, 0, msg.speed);
+        pca9685->setPWM(1, 0, msg.steering);
     }
 }
 
@@ -73,6 +72,7 @@ int main(int argc, char **argv)
     }
     else
     {
+        // printf("PCA9685 Device Address: 0x%02X\n", pca9685->kI2CAddress);
         printf("PCA9685 Device Address: 0x%02X\n", pca9685->kI2CAddress);
         pca9685->setAllPWM(0, 0);
         pca9685->reset();

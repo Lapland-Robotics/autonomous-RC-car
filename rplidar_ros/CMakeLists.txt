@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.0.2)
 project(rplidar_ros)
 
 set(RPLIDAR_SDK_PATH "./sdk/")
@@ -15,6 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rosconsole
   sensor_msgs
+  geometry_msgs
+  std_msgs
+  driving_controls_msg_cpp
 )
 
 include_directories(
@@ -28,10 +31,13 @@ catkin_package()
 add_executable(rplidarNode src/node.cpp ${RPLIDAR_SDK_SRC})
 target_link_libraries(rplidarNode ${catkin_LIBRARIES})
 
-add_executable(rplidarNodeClient src/client.cpp)
-target_link_libraries(rplidarNodeClient ${catkin_LIBRARIES})
+add_executable(obstacleDetection src/obstacleDetection.cpp)
+target_link_libraries(obstacleDetection ${catkin_LIBRARIES})
 
-install(TARGETS rplidarNode rplidarNodeClient
+add_dependencies(obstacleDetection driving_controls_msg_cpp_generate_messages_cpp)
+
+
+install(TARGETS rplidarNode obstacleDetection
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
