@@ -7,13 +7,17 @@ project(vision)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+message(STATUS "openCV_LIBS dir: ${OpenCV2_LIBS}")
+
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   roscpp
   sensor_msgs
-  OpenCV
   image_transport
 )
+
+find_package(OpenCV REQUIRED PATHS /usr/local/share/OpenCV/ NO_DEFAULT_PATH)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -140,7 +144,8 @@ include_directories(
 ###add_executable(${PROJECT_NAME}_node src/vision_node.cpp)
 add_executable(vision_pub src/vision_pub.cpp)
 add_executable(vision_sub src/vision_sub.cpp)
-
+add_executable(RosVideoCapture src/RosVideoCapture.cpp)
+add_executable(videoCapture src/videoCapture.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -159,13 +164,18 @@ add_dependencies(vision_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
 
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-
 ## Specify libraries to link a library or executable target against
 target_link_libraries(vision_pub
-  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
+  ${catkin_LIBRARIES} ${OpenCV_LIBS} )
 
 target_link_libraries(vision_sub
-  ${catkin_LIBRARIES})
+  ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+target_link_libraries(RosVideoCapture
+  ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+target_link_libraries(videoCapture
+  ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #############
 ## Install ##
 #############

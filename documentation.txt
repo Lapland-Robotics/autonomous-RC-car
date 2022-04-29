@@ -1,0 +1,213 @@
+1. Install ROS
+  1.1 Set the Jetson Xavier NX to accept software from packages.ros.org:
+	$ sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+  1.2 Add a new apt key:
+	$ sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+  1.3 Update the Debian packages index:
+	$ sudo apt update
+  1.4 Install the ROS Desktop package:
+  	$ sudo apt install ros-melodic-desktop
+  1.5 Load the ROS environment variables automatically when you execute a new shell session. Update 
+      your .bashrc script:
+	$ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc 
+	$ source ~/.bashrc
+  1.6 Install and initialize rosdep:
+	$ sudo apt install python-rosdep python-rosinstall python-rosinstall-generatorpython-wstool build-essential
+	$ sudo rosdep init
+	$ rosdep update
+  1.7 Install the following dependencies:
+	$ sudo apt-get install cmake python-catkin-pkg python-empy python-nose python-setuptools libgtest-dev python-rosinstall python-rosinstall-generator python-wstool build-essential git
+  1.8 Create the catkin root and source folders:
+	$ mkdir -p ~/catkin_ws/src 
+	$ cd ~/catkin_ws/
+  1.9 Configure the catkin workspace by issuing a first “empty” build command:
+	$ catkin_make
+  1.10 Finally, update your .bashrc script with the information about the new workspace:
+	$ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc 
+	$ source ~/.bashrc
+
+
+2. ROS driving controls
+  2.1 Create package:
+	desktop:~/catkin_ws/src$ catkin_create_pkg driving_controls_msg_cpp roscpp 
+	   message_generation std_msgs geometry_msgs
+  2.2 Create msg folder:
+	desktop:~/home/sdv/catkin_ws/src/driving_controls_msg_cpp$ mkdir msg
+  2.3 Create msg file:
+	desktop:~/home/sdv/catkin_ws/src/driving_controls_msg_cpp/msg$ touch driving_controls.msg
+  2.4 Create publisher and listner file:
+	desktop:~/home/sdv/catkin_ws/src/driving_controls_msg_cpp/src$ touch 		 	 
+	   driving_controls_pub.cpp && touch driving_control_sub.cpp
+  2.5 Edit CMakeLists.txt and package.xml:
+	/home/sdv/catkin_ws/src/driving_controls_msg_cpp/
+  2.6 Build project:
+	desktop:~/home/sdv/catkin_ws$ catkin_make
+  2.7 Source from setup.bash:
+	desktop:~/home/sdv/catkin_ws$ source devel/setup.bash
+  2.8 Start roscore:
+	open a new terminal$ roscore
+  2.9 Run publisher:
+	open new terminal$ rosrun driving_controls_msg_cpp driving_controls_pub
+  2.10 Run subscriber:
+	open new terminal$ rosrun driving_controls_msg_cpp driving_controls_sub
+
+3. vision
+  3.1 Create package:
+	desktop:~/catkin_ws/src$ catkin_create_pkg vision roscpp cv_bridge sensor_msgs
+  3.2 cv_bridge expects /usr/include/opencv but on jetson systems it's under 
+      /usr/include/opencv4/opencv2. Solve it by symlinking the directories:
+	desktop:~/catkin_ws$ sudo ln -s /usr/include/opencv4/opencv2/ /usr/include/opencv
+		(source: https://answers.ros.org/question/199279/ installation-from-source-fails-because-of-cv_bridge-include-dir/)
+  3.3 Install gtk and gtk3 module:
+	$ sudo apt install libcanberra-gtk-module libcanberra-gtk3-module
+  3.4 Select the right connector
+     3.4.1 Start the jetson-io python program
+	desktop:~$ sudo /opt/nvidia/jetson-io/jetson-io.py
+     3.4.2 Select:
+ 	Configure Jetson Nano CSI Connector
+     3.4.3 Select:
+ 	Configure for compatible hardware
+     3.4.4 sSelect:
+	Camera IMX477 Dual
+     3.4.5 Select:
+	Save pin changes
+     3.4.6 Select:
+	Save and reboot to reconfigure pins
+     3.4.7 The Jetson will now reboot
+  3.5 Install openvc package
+     3.5.1 desktop:~$ cd Documents/
+	 3.5.2 git checkout v1.0 \
+    	   && ./buildOpenCV.sh\
+    	   && ./removeOpenCVSources.sh
+	 ??? 3.5.3 sudo apt-get update \
+    && sudo apt-get install -y ros-melodic-cv-bridge \
+    && sudo apt-get install -y ros-melodic-vision-opencv \
+    && sudo apt-get install -y libi2c-dev i2c-tools \
+    && sudo apt-get install gstreamer1.0-tools
+	
+  3.5 Create publisher and listner file:
+	desktop:~/catkin_ws/src/vision/src$ touch vision_pub.cpp && touch vision_sub.cpp
+  3.6 Edit CMakeLists.txt and package.xml
+	desktop:~/catkin_ws/src/vision
+  3.7 Build project:
+	desktop:~/home/sdv/catkin_ws$ catkin_make
+  3.8 Source from setup.bash:
+	desktop:~/home/sdv/catkin_ws$ source devel/setup.bash
+  3.9 Start roscore:
+	open a new terminal$ roscore
+  3.10 Run publisher:
+	open new terminal$ rosrun vision vision_pub
+  3.11 Run subscriber:
+	open new terminal$ rosrun vision vision_sub
+
+4 RPLidar
+  4.1 Clone the rplidar_ros repo into catkin workspace
+	desktop:~/catkin_ws/src$ git clone https://github.com/Slamtec/rplidar_ros.git
+  4.2 Build project:
+	desktop:~/home/sdv/catkin_ws$ catkin_make
+  4.3 Check the authority of rplidar's serial-port:
+	desktop:~/catkin_ws$ ls -l /dev |grep ttyUSB
+  4.4 Add the authority of write to the correct port (this case USB0):
+	desktop:~/catkin_ws$ sudo chmod 666 /dev/ttyUSB0
+  4.5 Source from setup.bash:
+	desktop:~/home/sdv/catkin_ws$ source devel/setup.bash
+  4.6 To run the lidar in RViz (visualize the data):
+	desktop:~/catkin_ws$ roslaunch rplidar_ros view_rplidar_a3.launch
+  4.7 To start the rostopic /scan:
+	desktop:~/catkin_ws$ roslaunch rplidar_ros rplidar_a3.launch
+   4.7.1 The scan mode can be changed to one of the following:
+		- Standard: max_distance: 16.0 m, Point number: 4.0K
+ 		- Express: max_distance: 16.0 m, Point number: 7.9K
+ 		- Boost: max_distance: 25.0 m, Point number: 15.9K
+ 		- Sensitivity: max_distance: 25.0 m, Point number: 15.9K
+ 		- Stability: max_distance: 25.0 m, Point number: 10.0K
+	  To change this edit 'rplidar_a3.launch' located: /home/sdv/catkin_ws/src/rplidar_ros/launch
+   4.8 To start obstacleDetection (Note that rplidar_a3 from above has to be running)
+    desktop:~/catkin_ws$ rosrun rplidar_ros obstacleDetection
+
+5 Remote control
+  5.1 Enabl Desktop Sharing.
+    5.1.1 Open this file.
+		sdv@sdv-desktop:~$ sudo vi /usr/share/glib-2.0/schemas/org.gnome.Vino.gschema.xml
+	5.1.2 Paste the following key in the file and save.
+		<key name='enabled' type='b'>
+			<summary>Enable remote access to the desktop</summary>
+			<description>
+				If true, allows remote access to the desktop via the RFB
+				protocol. Users on remote machines may then connect to the
+				desktop using a VNC viewer.
+			</description>
+			<default>true</default>
+		</key>
+  5.2 Set default output resolution
+    5.2.1 When no screen is connected to the Jetson the default output is 640x480
+    5.2.2 Open xorg.conf
+		sdv@sdv-desktop:~$ sudo vi /etc/X11/xorg.conf
+	5.2.3 Under the section "Device" add following
+			Section "Monitor"
+				Identifier "DSI-0"
+				Option    "Ignore"
+			EndSection
+
+			Section "Screen"
+				Identifier    "Default Screen"
+				Monitor        "Configured Monitor"
+				Device        "Default Device"
+			   SubSection "Display"
+				Depth    24
+				Virtual 1920 1080
+			  EndSubSection 
+			EndSection
+  5.2 Compile the schemas for Gnome.
+	sdv@sdv-desktop:~$ sudo glib-compile-schemas /usr/share/glib-2.0/schemas
+  5.3 Open desktop Sharing in settings.
+	5.3.1 Enable "Allow other users to view your desktop" and "Allow other users to controls your desktop".
+	5.3.2 Enable "Require the user to enter this password:" and choose a password.
+  5.4 Start the VNC server on every startup.
+	5.4.1 Open startup applications.
+	5.4.2 Click on add in the top right corner.
+	5.4.3 Give as name "Vino"
+	5.4.4 In the command box enter "/usr/lib/vino/vino-server".
+	5.4.5 Enter a comment such as "Remote desktop".
+  5.5 Disable encryption of the VNC connection.
+	sdv@sdv-desktop:~$ gsettings set org.gnome.Vino require-encryption false
+	sdv@sdv-desktop:~$ gsettings set org.gnome.Vino prompt-enabled false
+  5.6 Reboot the Jetson
+  5.7 On another device install Remmina.
+	5.7.1 On Linux use sudo apt-get install remmina
+  5.8 Add a device in Remmina.
+	5.8.1 In the top left corner click "New connection profile"
+	5.8.2 Give it a name, 
+	5.8.3 Enter the ip of the Jetson in the section Server (make sure you are on the same network).
+	5.8.4 Enter the username and password.
+	5.8.5 Click Save and Connect.
+
+	source https://medium.com/@bharathsudharsan023/jetson-nano-remote-vnc-access-d1e71c82492b
+
+6 Pilot
+	Install sudo apt-get install libncurses5-dev libncursesw5-dev
+
+
+
+Docker
+
+Solve permission denied
+  .1 Create the docker group.
+	$ sudo groupadd docker
+  .2 Add your user to the docker group.
+	$ sudo usermod -aG docker $USER
+  .3 Log out and log back in to  so that your group membership is re-evaluated.
+
+install docker-compose
+sudo apt install docker-compose
+
+execute the build script
+	sdv-desktop:~/Documents/SDV-project/Docker$./build:sh
+
+You may need to give the build_ubuntu_image.sh and build_ros_sdv_image.sh execute permissions.
+Execute the following commands:
+	sdv-desktop:~/Documents/SDV-project/Docker/ubuntu_docker$ chmod +x build_ubuntu_image.sh
+	sdv-desktop:~/Documents/SDV-project/Docker/sdv_container$ chmod +x build_ros_sdv_image.sh
+	sdv-desktop:~/Documents/SDV-project/Docker$ chmod +x build.sh
+
+

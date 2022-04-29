@@ -1,3 +1,9 @@
+##### Video resources of the project 
+/pilot/resources/*.avi
+/pilot/resources/*.mp4
+
+/vision/resources/*.avi
+
 ##### Windows
 # Windows thumbnail cache files
 Thumbs.db
