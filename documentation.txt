@@ -103,26 +103,27 @@
 4 RPLidar
   4.1 Clone the rplidar_ros repo into catkin workspace
 	desktop:~/catkin_ws/src$ git clone https://github.com/Slamtec/rplidar_ros.git
+  4.2 Set permissions for ttyUSB
+    4.2.1 Execute the create_udev_rules script
+		desktop:~/catkin_ws/src/rplidar_ros$ chmod +x ./scripts/create_udev_rules.sh
+		desktop:~/catkin_ws/src/rplidar_ros$ ./scripts/create_udev_rules.sh
+    4.2.2 Reboot your system
   4.2 Build project:
 	desktop:~/home/sdv/catkin_ws$ catkin_make
-  4.3 Check the authority of rplidar's serial-port:
-	desktop:~/catkin_ws$ ls -l /dev |grep ttyUSB
-  4.4 Add the authority of write to the correct port (this case USB0):
-	desktop:~/catkin_ws$ sudo chmod 666 /dev/ttyUSB0
-  4.5 Source from setup.bash:
+  4.3 Source from setup.bash:
 	desktop:~/home/sdv/catkin_ws$ source devel/setup.bash
-  4.6 To run the lidar in RViz (visualize the data):
+  4.4 To run the lidar in RViz (visualize the data):
 	desktop:~/catkin_ws$ roslaunch rplidar_ros view_rplidar_a3.launch
-  4.7 To start the rostopic /scan:
+  4.5 To start the rostopic /scan:
 	desktop:~/catkin_ws$ roslaunch rplidar_ros rplidar_a3.launch
-   4.7.1 The scan mode can be changed to one of the following:
+   4.5.1 The scan mode can be changed to one of the following:
 		- Standard: max_distance: 16.0 m, Point number: 4.0K
  		- Express: max_distance: 16.0 m, Point number: 7.9K
  		- Boost: max_distance: 25.0 m, Point number: 15.9K
  		- Sensitivity: max_distance: 25.0 m, Point number: 15.9K
  		- Stability: max_distance: 25.0 m, Point number: 10.0K
 	  To change this edit 'rplidar_a3.launch' located: /home/sdv/catkin_ws/src/rplidar_ros/launch
-   4.8 To start obstacleDetection (Note that rplidar_a3 from above has to be running)
+   4.6 To start obstacleDetection (Note that rplidar_a3 from above has to be running)
     desktop:~/catkin_ws$ rosrun rplidar_ros obstacleDetection
 
 5 Remote control
