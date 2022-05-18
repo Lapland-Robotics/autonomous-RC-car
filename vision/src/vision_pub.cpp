@@ -6,6 +6,7 @@
 #include <opencv2/opencv.hpp>
 
 using namespace std;
+using namespace cv;
 
 // using gstreamer_pipeline to send video
 std::string gstreamer_pipeline(int capture_width, int capture_height, int display_width, int display_height, int framerate, int flip_method)
@@ -51,7 +52,8 @@ int main(int argc, char **argv)
     return (-1);
     cout << "Failed to open camera." << endl;
   }
-  cv::Mat frame;
+  Mat frame;
+  Mat img_gray;
   sensor_msgs::ImagePtr msg;
 
   ros::Rate loop_rate(300);
@@ -61,7 +63,13 @@ int main(int argc, char **argv)
     // Check if grabbed frame is actually full with some content
     if (!frame.empty())
     {
-      msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
+      //Reduce the image so that only the floor remains
+      frame = frame(Range(275, 600), Range(0, 1280));
+
+      //Make the image grayscale
+      cvtColor(frame, img_gray, COLOR_BGR2GRAY);
+
+      msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_gray).toImageMsg();
       pub.publish(msg);
       cv::waitKey(1);
     }

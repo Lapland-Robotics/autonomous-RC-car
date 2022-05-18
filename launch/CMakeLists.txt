@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(vision)
+project(launch)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -7,17 +7,11 @@ project(vision)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-
-message(STATUS "openCV_LIBS dir: ${OpenCV2_LIBS}")
-
 find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
   roscpp
-  sensor_msgs
-  image_transport
+  std_msgs
+  roslaunch
 )
-
-find_package(OpenCV REQUIRED PATHS /usr/local/share/OpenCV/ NO_DEFAULT_PATH)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -76,7 +70,7 @@ find_package(OpenCV REQUIRED PATHS /usr/local/share/OpenCV/ NO_DEFAULT_PATH)
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   sensor_msgs
+#   std_msgs
 # )
 
 ################################################
@@ -110,10 +104,15 @@ find_package(OpenCV REQUIRED PATHS /usr/local/share/OpenCV/ NO_DEFAULT_PATH)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES vision
-#  CATKIN_DEPENDS cv_bridge roscpp sensor_msgs
+#  LIBRARIES launch
+#  CATKIN_DEPENDS roscpp std_msgs
 #  DEPENDS system_lib
 )
+
+#######################
+## Check Launch file ##
+#######################
+roslaunch_add_file_check(launch)
 
 ###########
 ## Build ##
@@ -121,15 +120,14 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories( 
-  include
+include_directories(
+# include
   ${catkin_INCLUDE_DIRS}
-  ${OpenCV_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/vision.cpp
+#   src/${PROJECT_NAME}/launch.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -140,12 +138,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-
-###add_executable(${PROJECT_NAME}_node src/vision_node.cpp)
-add_executable(vision_pub src/vision_pub.cpp)
-add_executable(vision_sub src/vision_sub.cpp)
-add_executable(videoCapture src/videoCapture.cpp)
-
+# add_executable(${PROJECT_NAME}_node src/launch_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -153,25 +146,15 @@ add_executable(videoCapture src/videoCapture.cpp)
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
 
-add_dependencies(vision_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-#target_link_libraries(vision_pub opencv4)
-
-
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(vision_pub
-  ${catkin_LIBRARIES} ${OpenCV_LIBS} )
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
 
-target_link_libraries(vision_sub
-  ${catkin_LIBRARIES} ${OpenCV_LIBS})
-
-target_link_libraries(videoCapture
-  ${catkin_LIBRARIES} ${OpenCV_LIBS})
 #############
 ## Install ##
 #############
@@ -219,7 +202,7 @@ target_link_libraries(videoCapture
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_vision.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_launch.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

@@ -1,4 +1,5 @@
 #include "ros/ros.h"
+#include <signal.h>
 #include "driving_controls_msg_cpp/driving_controls.h"
 #include "std_msgs/String.h"
 
@@ -50,20 +51,37 @@ int getkey()
 //print the incomming values and check if there valid and than set the values
 void setValues(const driving_controls_msg_cpp::driving_controls &msg)
 {
-    ROS_INFO("speed: [%d]", msg.speed);
-    ROS_INFO("steering: [%d]", msg.steering);
-    if (msg.speed < 410 && msg.speed > 205 && msg.steering > 265 && msg.steering < 376)
+    //ROS_WARN("speed: [%d]", msg.speed);
+    //ROS_WARN("steering: [%d]", msg.steering);
+    if (msg.speed < 410 && msg.speed > 205)
     {
-        cout << "valid" << endl;
+        ROS_DEBUG("valid speed value");
         pca9685->setPWM(0, 0, msg.speed);
+    }
+
+    if (msg.steering >= 265 && msg.steering <= 376)
+    {
+        ROS_DEBUG("valid steering value");
         pca9685->setPWM(1, 0, msg.steering);
     }
+}
+
+void mySigintHandler(int sig)
+{
+    ROS_WARN_STREAM("STOPPING CAR");
+    pca9685->openPCA9685();
+    pca9685->setPWM(0, 0, 300);
+    ros::Duration(0.2).sleep();
+    ros::shutdown();
 }
 
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "driving_controls_sub");
     ros::NodeHandle n;
+
+    signal(SIGINT, mySigintHandler);
+
     //check the conecction on the PWM board
     int err = pca9685->openPCA9685();
     if (err < 0)
@@ -72,7 +90,6 @@ int main(int argc, char **argv)
     }
     else
     {
-        // printf("PCA9685 Device Address: 0x%02X\n", pca9685->kI2CAddress);
         printf("PCA9685 Device Address: 0x%02X\n", pca9685->kI2CAddress);
         pca9685->setAllPWM(0, 0);
         pca9685->reset();

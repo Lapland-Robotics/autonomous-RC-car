@@ -154,14 +154,12 @@ include_directories(
 add_executable(autopilot src/autopilot.cpp)
 add_executable(tests_autopilot src/tests_autopilot.cpp)
 add_executable(pilot src/key_controls.cpp)
-add_executable(runLaneDetector src/runLaneDetector.cpp)
-
 
 target_link_libraries(autopilot ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries(tests_autopilot ${catkin_LIBRARIES} ${OpenCV_LIBS})
 target_link_libraries(pilot ${catkin_LIBRARIES} ${OpenCV_LIBS})
-target_link_libraries(runLaneDetector ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
+add_dependencies(autopilot driving_controls_msg_cpp_generate_messages_cpp)
 add_dependencies(pilot driving_controls_msg_cpp_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
