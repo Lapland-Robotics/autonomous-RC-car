@@ -2,7 +2,10 @@
 #include <signal.h>
 #include "driving_controls_msg_cpp/driving_controls.h"
 #include "std_msgs/String.h"
+#include <std_msgs/Bool.h>
+#include <ros/callback_queue.h>
 
+#include <thread>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,30 +25,18 @@ using namespace std;
 // ESC forward min 320, max 400
 // ESC backwards min 298, max 200
 
+bool CanDrive = false;
+bool isStoped = false;
+
 PCA9685 *pca9685 = new PCA9685();
 
-int getkey()
+ros::Subscriber obstacles_PRIO_messages_sub;
+ros::CallbackQueue PRIO_Calback_queue;
+
+void obstaclePRIOCallback(const std_msgs::Bool &CanDriveMsg)
 {
-    int character;
-    struct termios orig_term_attr;
-    struct termios new_term_attr;
-
-    /* set the terminal to raw mode */
-    tcgetattr(fileno(stdin), &orig_term_attr);
-    memcpy(&new_term_attr, &orig_term_attr, sizeof(struct termios));
-    new_term_attr.c_lflag &= ~(ECHO | ICANON);
-    new_term_attr.c_cc[VTIME] = 0;
-    new_term_attr.c_cc[VMIN] = 0;
-    tcsetattr(fileno(stdin), TCSANOW, &new_term_attr);
-
-    /* read a character from the stdin stream without blocking */
-    /*   returns EOF (-1) if no character is available */
-    character = fgetc(stdin);
-
-    /* restore the original terminal attributes */
-    tcsetattr(fileno(stdin), TCSANOW, &orig_term_attr);
-
-    return character;
+    //ROS_WARN_STREAM("status: " << (CanDriveMsg.data ? "drive" : "stop"));
+    CanDrive = CanDriveMsg.data;
 }
 
 //print the incomming values and check if there valid and than set the values
@@ -53,10 +44,23 @@ void setValues(const driving_controls_msg_cpp::driving_controls &msg)
 {
     //ROS_WARN("speed: [%d]", msg.speed);
     //ROS_WARN("steering: [%d]", msg.steering);
-    if (msg.speed < 410 && msg.speed > 205)
+
+    //check if the incoming value is valid and set the PWM signal
+
+    if (msg.speed < 410 && msg.speed > 205 && CanDrive)
     {
         ROS_DEBUG("valid speed value");
         pca9685->setPWM(0, 0, msg.speed);
+        isStoped = false;
+    }
+    else if (!isStoped){
+        pca9685->setPWM(0, 0, 285);
+        usleep(8 * 1000);
+        pca9685->setPWM(0, 0, 308);   
+    }
+    else
+    {
+        isStoped = true;
     }
 
     if (msg.steering >= 265 && msg.steering <= 376)
@@ -66,8 +70,9 @@ void setValues(const driving_controls_msg_cpp::driving_controls &msg)
     }
 }
 
-void mySigintHandler(int sig)
+void signalInterrupt(int sig)
 {
+    //stop the car when user shutsdown the program
     ROS_WARN_STREAM("STOPPING CAR");
     pca9685->openPCA9685();
     pca9685->setPWM(0, 0, 300);
@@ -80,7 +85,20 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "driving_controls_sub");
     ros::NodeHandle n;
 
-    signal(SIGINT, mySigintHandler);
+    //make a priority callback for obstacle detection data
+    ros::NodeHandle nh_PRIO;
+    ros::CallbackQueue *PRIO_Calback_queue_ptr = &PRIO_Calback_queue;
+    nh_PRIO.setCallbackQueue(PRIO_Calback_queue_ptr);
+
+    //signal interrupt handler
+    signal(SIGINT, signalInterrupt);
+
+    obstacles_PRIO_messages_sub = nh_PRIO.subscribe("obstacle_detection_control", 50, obstaclePRIOCallback);
+
+    std::thread PRIO_thread_spinner = std::thread([PRIO_Calback_queue_ptr]() {
+        ros::SingleThreadedSpinner PRIO_spinner;
+        PRIO_spinner.spin(PRIO_Calback_queue_ptr);
+    });
 
     //check the conecction on the PWM board
     int err = pca9685->openPCA9685();
@@ -98,5 +116,7 @@ int main(int argc, char **argv)
         ros::Subscriber sub = n.subscribe("driving_controls_msg_cpp", 1000, setValues);
         ros::spin();
     }
+
+    PRIO_thread_spinner.join();
     return 0;
 }

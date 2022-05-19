@@ -19,7 +19,7 @@ std::string gstreamer_pipeline(int capture_width, int capture_height, int displa
 
 int main(int argc, char **argv)
 {
-
+  //define values for the video
   int capture_width = 1280;
   int capture_height = 720;
   int display_width = 1280;
@@ -69,11 +69,11 @@ int main(int argc, char **argv)
       //Make the image grayscale
       cvtColor(frame, img_gray, COLOR_BGR2GRAY);
 
+      //place the image on the topic
       msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_gray).toImageMsg();
       pub.publish(msg);
       cv::waitKey(1);
     }
-
     loop_rate.sleep();
   }
 }

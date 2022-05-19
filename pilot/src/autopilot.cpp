@@ -22,6 +22,7 @@ using namespace cv;
 vector<vector<Point>> contours;
 vector<Vec4i> hierarchy;
 
+//values of bounding boxes
 Point leftBottomMin = Point(0, 200);
 Point leftBottomMax = Point(160, 400);
 Point leftMiddleMin = Point(600, 100);
@@ -41,8 +42,9 @@ int leftTopCounter;
 int rightBottomCounter;
 int rightMiddleCounter;
 
-int vehicleSpeed = 14;
-int cornerSpeed = 13;
+//define speeds
+int vehicleSpeed = 15;
+int cornerSpeed = 14;
 int previousSpeed;
 
 Mat camera;
@@ -80,26 +82,18 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
         Mat frame = cv_bridge::toCvShare(msg, "bgr8")->image;
         cv::waitKey(30);
 
-        //rescale so only the floor is visible
-        //frame = frame(Range(290, 600), Range(0, 1280));
-
-        //convert to gray scale image
-        //Mat img_gray;
-        //cvtColor(frame, img_gray, COLOR_BGR2GRAY);
-
         //blur the image for better edge detection
         Mat img_blur;
-        // GaussianBlur(frame, img_blur, Size(3, 3), 0);
         GaussianBlur(frame, img_blur, Size(7, 7), 0);
 
         //apply Canny edge detection
         Mat canny;
         //adjust threshold 1 and 2 that we only see the white line
-        //Canny(img_blur, canny, 50, 570, 3, false);
         Canny(img_blur, canny, 30, 300, 3, false);
 
-        // Find contours on canny image
+        //Find contours on canny image
         findContours(canny, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+
         vector<vector<Point>> contours_poly(contours.size());
         vector<Rect> boundRect(contours.size());
         vector<Point2f> centers(contours.size());
@@ -142,7 +136,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
                 //right middle rectangle
                 if (comparePoints(j.x, j.y, rightMiddleMin.x, rightMiddleMin.y, rightMiddleMax.x, rightMiddleMax.y))
                 {
-                    putText(frame, "rightMiddle", Point(200, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 0, 255), 3, 2);
+                    //putText(frame, "rightMiddle", Point(200, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 0, 255), 3, 2);
                     rightMiddleCounter++;
                 }
 
@@ -150,39 +144,39 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
                 // drawContours(frame, contours, i, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point());
                 // approxPolyDP(contours[i], contours_poly[i], 3, true);
                 // boundRect[i] = boundingRect(contours_poly[i]);
-
-                //draw the areas where the line should be in
             }
         }
 
         int leftAmount = leftBottomCounter + leftMiddleCounter + leftTopCounter;
         int rightAmount = rightBottomCounter + rightMiddleCounter;
-
+        
+        //draw the areas where the line should be in
         //left bottom green
-        rectangle(frame, leftBottomMin, leftBottomMax, Scalar(0, 255, 0), 2);
-        //left top green
-        rectangle(frame, leftTopMin, leftTopMax, Scalar(0, 255, 0), 2);
-        //left middle green
-        rectangle(frame, leftMiddleMin, leftMiddleMax, Scalar(0, 255, 0), 2);
-        //left blue
-        rectangle(frame, rightMiddleMin, rightMiddleMax, Scalar(255, 0, 0), 2);
-        //right blue
-        rectangle(frame, rightBottomMin, rightBottomMax, Scalar(255, 0, 0), 2);
+        // rectangle(frame, leftBottomMin, leftBottomMax, Scalar(0, 255, 0), 2);
+        // //left top green
+        // rectangle(frame, leftTopMin, leftTopMax, Scalar(0, 255, 0), 2);
+        // //left middle green
+        // rectangle(frame, leftMiddleMin, leftMiddleMax, Scalar(0, 255, 0), 2);
+        // //left blue
+        // rectangle(frame, rightMiddleMin, rightMiddleMax, Scalar(255, 0, 0), 2);
+        // //right blue
+        // rectangle(frame, rightBottomMin, rightBottomMax, Scalar(255, 0, 0), 2);
 
-        //if more than 20 points have been seen in both left areas, assume that the line goes to the right
+        //if more than 15 points have been seen in both left areas, assume that the line goes to the right
         if (leftBottomCounter >= 15 && leftMiddleCounter >= 15 || leftTopCounter >= 15 && leftAmount > rightAmount)
         {
             controlMsg.steering = remap(-25, -25, 25, 265, 376);
             setSpeed(cornerSpeed);
             //putText(frame, "RIGHT", Point(550, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 100, 255), 3, 2);
         }
-        //if more than 20 points have been seen in both right areas, assume that the line goes to the left
+        //if more than 15 points have been seen in both right areas, assume that the line goes to the left
         else if (rightBottomCounter >= 15 && rightMiddleCounter >= 15 && rightAmount + leftTopCounter > leftAmount)
         {
             controlMsg.steering = remap(25, -25, 25, 265, 376);
             setSpeed(cornerSpeed);
             //putText(frame, "LEFT", Point(550, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 100, 255), 3, 2);
         }
+        //if the line neither goes to the left or right go straight
         else
         {
             controlMsg.steering = remap(0, -25, 25, 265, 376);
@@ -190,10 +184,10 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
             //putText(frame, "STRAIGHT", Point(550, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(100, 100, 255), 3, 2);
         }
 
-        //ROS_WARN_STREAM("autopilot " << controlMsg);
-
+        //publish the updated direction and speed
         pub.publish(controlMsg);
 
+        //reset the values
         leftBottomCounter = 0;
         leftTopCounter = 0;
         leftMiddleCounter = 0;
@@ -201,29 +195,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
         rightMiddleCounter = 0;
 
         //show the result
-        imshow("Linde detection", frame);
-
-        //wait one millisecond between successive frames and break the loop if key q is pressed
-        if (waitKey(10) == 'q')
-        {
-            cout << "Stopping line detection" << endl;
-            //vid_capture.release();
-            destroyAllWindows();
-            controlMsg.speed = remap(0, -100, 100, 200, 400);
-            ROS_WARN_STREAM("steering " << controlMsg);
-
-            pub.publish(controlMsg);
-
-            exit(0);
-            //break;
-        }
-        if (waitKey(10) == 'p')
-        {
-            cout << "Pausing the video" << endl;
-            while (waitKey(10) != 'p')
-            {
-            }
-        }
+        //imshow("Linde detection", frame);
     }
     catch (cv_bridge::Exception &e)
     {
@@ -237,7 +209,7 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "autopilot_driving_control", ros::init_options::NoSigintHandler);
     ros::NodeHandle nh;
 
-    //driving controls
+    //driving_controls
     pub = nh.advertise<driving_controls_msg_cpp::driving_controls>("driving_controls_msg_cpp", 10);
     ros::Rate loop_rate(10);
     //driving_controls_msg_cpp::driving_controls controlMsg;

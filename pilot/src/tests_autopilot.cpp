@@ -14,14 +14,14 @@ RNG rng(12345);
 
 Point leftBottomMin = Point(0, 200);
 Point leftBottomMax = Point(160, 400);
-Point leftMiddleMin = Point(600, 80);
-Point leftMiddleMax = Point(700, 280);
+Point leftMiddleMin = Point(600, 100);
+Point leftMiddleMax = Point(700, 300);
 Point leftTopMin = Point(250, 200);
 Point leftTopMax = Point(300, 300);
 
-Point rightMiddleMin = Point(450, 60);
-Point rightMiddleMax = Point(550, 220);
-Point rightBottomMin = Point(1100, 100);
+Point rightMiddleMin = Point(450, 70);
+Point rightMiddleMax = Point(550, 240);
+Point rightBottomMin = Point(950, 130);
 Point rightBottomMax = Point(1300, 400);
 
 int leftBottomCounter;
@@ -90,6 +90,7 @@ int main()
 
         // Blur the image for better edge detection
         Mat img_blur;
+        // GaussianBlur(frame, img_blur, Size(3, 3), 0);
         GaussianBlur(img_gray, img_blur, Size(7, 7), 0);
         imshow("blured image", img_blur);
 
@@ -97,6 +98,8 @@ int main()
         Mat canny;
         //adjust threshold 1 and 2 that we only see the white line
         Canny(img_blur, canny, 30, 340, 3, false);
+        //Canny(img_blur, canny, 50, 570, 3, false);
+
         // Display canny edge detected image
         imshow("canny edge detection", canny);
 

@@ -10,6 +10,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
 {
   try
   {
+    //display the image using openCV
     cv::imshow("view", cv_bridge::toCvShare(msg, "bgr8")->image);
     cv::waitKey(30);
   }
@@ -26,6 +27,7 @@ int main(int argc, char **argv)
   cv::namedWindow("view");
 
   image_transport::ImageTransport it(nh);
+  //read the topic
   image_transport::Subscriber sub = it.subscribe("camera/image", 1, imageCallback);
   ros::spin();
   cv::destroyWindow("view");
