@@ -28,11 +28,15 @@ include_directories(
 
 catkin_package()
 
+
 add_executable(rplidarNode src/node.cpp ${RPLIDAR_SDK_SRC})
 target_link_libraries(rplidarNode ${catkin_LIBRARIES})
 
 add_executable(obstacleDetection src/obstacleDetection.cpp)
 target_link_libraries(obstacleDetection ${catkin_LIBRARIES})
+
+add_executable(ObjectDetectionHeightMeasurement src/ObjectDetectionHeightMeasurement.cpp ${RPLIDAR_SDK_SRC})
+target_link_libraries(ObjectDetectionHeightMeasurement ${catkin_LIBRARIES})
 
 add_dependencies(obstacleDetection driving_controls_msg_cpp_generate_messages_cpp)
 

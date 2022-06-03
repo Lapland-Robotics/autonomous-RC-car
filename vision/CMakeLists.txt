@@ -145,6 +145,9 @@ include_directories(
 add_executable(vision_pub src/vision_pub.cpp)
 add_executable(vision_sub src/vision_sub.cpp)
 add_executable(videoCapture src/videoCapture.cpp)
+add_executable(heightMeasurement src/heightMeasurement.cpp)
+add_executable(vision_height_measurement_pub src/vision_height_measurement_pub.cpp)
+
 
 
 ## Rename C++ executable without prefix
@@ -164,14 +167,18 @@ add_dependencies(vision_pub ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(vision_pub
-  ${catkin_LIBRARIES} ${OpenCV_LIBS} )
+target_link_libraries(vision_pub ${catkin_LIBRARIES} ${OpenCV_LIBS} )
 
-target_link_libraries(vision_sub
-  ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(vision_sub ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-target_link_libraries(videoCapture
-  ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(videoCapture ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+target_link_libraries(heightMeasurement ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+target_link_libraries(vision_height_measurement_pub ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+
+
 #############
 ## Install ##
 #############

@@ -22,6 +22,8 @@ int main(int argc, char **argv)
   //define values for the video
   int capture_width = 1280;
   int capture_height = 720;
+  //int capture_width = 1920;
+  //int capture_height = 1080;
   int display_width = 1280;
   int display_height = 720;
   int framerate = 60;

@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
   VideoCapture cap(pipeline, CAP_GSTREAMER);
 
-  VideoWriter video("/home/sdv/catkin_ws/src/pilot/resources/trackRecording4.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 15, Size(1280, 720));
+  VideoWriter video("/home/sdv/catkin_ws/src/pilot/resources/demo.avi", cv::VideoWriter::fourcc('M', 'J', 'P', 'G'), 15, Size(1280, 720));
 
   cv::namedWindow("CSI Camera", WINDOW_AUTOSIZE);
   Mat frame;

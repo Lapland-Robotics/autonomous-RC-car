@@ -90,6 +90,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
         Mat canny;
         //adjust threshold 1 and 2 that we only see the white line
         Canny(img_blur, canny, 30, 300, 3, false);
+        //imshow("canny", canny);
 
         //Find contours on canny image
         findContours(canny, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
@@ -141,7 +142,7 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
                 }
 
                 //draw the found contours on the screen
-                // drawContours(frame, contours, i, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point());
+                //drawContours(frame, contours, i, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point());
                 // approxPolyDP(contours[i], contours_poly[i], 3, true);
                 // boundRect[i] = boundingRect(contours_poly[i]);
             }
@@ -152,15 +153,15 @@ void imageCallback(const sensor_msgs::ImageConstPtr &msg)
         
         //draw the areas where the line should be in
         //left bottom green
-        // rectangle(frame, leftBottomMin, leftBottomMax, Scalar(0, 255, 0), 2);
+        //rectangle(frame, leftBottomMin, leftBottomMax, Scalar(0, 255, 0), 2);
         // //left top green
-        // rectangle(frame, leftTopMin, leftTopMax, Scalar(0, 255, 0), 2);
+        //rectangle(frame, leftTopMin, leftTopMax, Scalar(0, 255, 0), 2);
         // //left middle green
-        // rectangle(frame, leftMiddleMin, leftMiddleMax, Scalar(0, 255, 0), 2);
+        //rectangle(frame, leftMiddleMin, leftMiddleMax, Scalar(0, 255, 0), 2);
         // //left blue
-        // rectangle(frame, rightMiddleMin, rightMiddleMax, Scalar(255, 0, 0), 2);
+        //rectangle(frame, rightMiddleMin, rightMiddleMax, Scalar(255, 0, 0), 2);
         // //right blue
-        // rectangle(frame, rightBottomMin, rightBottomMax, Scalar(255, 0, 0), 2);
+        //rectangle(frame, rightBottomMin, rightBottomMax, Scalar(255, 0, 0), 2);
 
         //if more than 15 points have been seen in both left areas, assume that the line goes to the right
         if (leftBottomCounter >= 15 && leftMiddleCounter >= 15 || leftTopCounter >= 15 && leftAmount > rightAmount)

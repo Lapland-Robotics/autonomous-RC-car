@@ -10,7 +10,7 @@ using namespace cv;
 
 vector<vector<Point>> contours;
 vector<Vec4i> hierarchy;
-RNG rng(12345);
+//RNG rng(12345);
 
 Point leftBottomMin = Point(0, 200);
 Point leftBottomMax = Point(160, 400);
@@ -42,7 +42,7 @@ bool comparePoints(int contourPointX, int contourPointY, int minX, int minY, int
 int main()
 {
     //video input test
-    VideoCapture vid_capture("/home/sdv/catkin_ws/src/pilot/resources/trackRecording4.avi");
+    VideoCapture vid_capture("/home/sdv/catkin_ws/src/pilot/resources/demo.avi");
 
     // Print error message if the stream is invalid
     if (!vid_capture.isOpened())
@@ -92,7 +92,7 @@ int main()
         Mat img_blur;
         // GaussianBlur(frame, img_blur, Size(3, 3), 0);
         GaussianBlur(img_gray, img_blur, Size(7, 7), 0);
-        imshow("blured image", img_blur);
+        //imshow("blured image", img_blur);
 
         // Canny edge detection
         Mat canny;
@@ -101,10 +101,11 @@ int main()
         //Canny(img_blur, canny, 50, 570, 3, false);
 
         // Display canny edge detected image
-        imshow("canny edge detection", canny);
+        //imshow("canny edge detection", canny);
 
         // Find contours
         findContours(canny, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+        
         //imshow("contours", contours);
 
         vector<vector<Point>> contours_poly(contours.size());
@@ -121,35 +122,35 @@ int main()
                 //left bottom green
                 if (comparePoints(j.x, j.y, leftBottomMin.x, leftBottomMin.y, leftBottomMax.x, leftBottomMax.y))
                 {
-                    putText(frame, "leftBottom", Point(30, 100), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 255), 3, 2);
+                    //putText(frame, "leftBottom", Point(30, 100), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 255), 3, 2);
                     leftBottomCounter++;
                 }
 
                 //left top rectangle
                 if (comparePoints(j.x, j.y, leftTopMin.x, leftTopMin.y, leftTopMax.x, leftTopMax.y))
                 {
-                    putText(frame, "leftTop", Point(50, 200), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 255), 3, 2);
+                    //putText(frame, "leftTop", Point(50, 200), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 255), 3, 2);
                     leftTopCounter++;
                 }
 
                 //left middle green
                 if (comparePoints(j.x, j.y, leftMiddleMin.x, leftMiddleMin.y, leftMiddleMax.x, leftMiddleMax.y))
                 {
-                    putText(frame, "leftMiddle", Point(700, 100), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 255), 3, 2);
+                    //putText(frame, "leftMiddle", Point(700, 100), FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 255, 255), 3, 2);
                     leftMiddleCounter++;
                 }
 
                 //right bottom blue
                 if (comparePoints(j.x, j.y, rightBottomMin.x, rightBottomMin.y, rightBottomMax.x, rightBottomMax.y))
                 {
-                    putText(frame, "rightBottom", Point(900, 200), FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 0, 255), 3, 2);
+                    //putText(frame, "rightBottom", Point(900, 200), FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 0, 255), 3, 2);
                     rightBottomCounter++;
                 }
 
                 //right middle blue
                 if (comparePoints(j.x, j.y, rightMiddleMin.x, rightMiddleMin.y, rightMiddleMax.x, rightMiddleMax.y))
                 {
-                    putText(frame, "rightMiddle", Point(200, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 0, 255), 3, 2);
+                    //putText(frame, "rightMiddle", Point(200, 50), FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 0, 255), 3, 2);
                     rightMiddleCounter++;
                 }
             }
@@ -159,8 +160,8 @@ int main()
             // cout << "rightMiddleCounter " << rightMiddleCounter << endl;
 
             drawContours(frame, contours, i, Scalar(0, 0, 255), 2, 8, hierarchy, 0, Point());
-            approxPolyDP(contours[i], contours_poly[i], 3, true);
-            boundRect[i] = boundingRect(contours_poly[i]);
+            //approxPolyDP(contours[i], contours_poly[i], 3, true);
+            //boundRect[i] = boundingRect(contours_poly[i]);
         }
 
         int leftAmount = leftBottomCounter + leftMiddleCounter + leftTopCounter;

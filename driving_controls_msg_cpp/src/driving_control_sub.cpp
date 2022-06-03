@@ -56,7 +56,7 @@ void setValues(const driving_controls_msg_cpp::driving_controls &msg)
     else if (!isStoped){
         pca9685->setPWM(0, 0, 285);
         usleep(8 * 1000);
-        pca9685->setPWM(0, 0, 308);   
+        pca9685->setPWM(0, 0, 300);   
     }
     else
     {

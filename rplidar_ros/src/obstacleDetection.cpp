@@ -72,7 +72,7 @@ void frontDetection(const sensor_msgs::LaserScan::ConstPtr &scan)
             if (scan->ranges[i] < 0.7)
             {
                 canDrive = false;
-                //ROS_INFO_STREAM("Obstacle in front of the car (distance: " << scan->ranges[i] << "m) \n");
+                //ROS_ERROR_STREAM("Obstacle in front of the car (distance: " << scan->ranges[i] << "m) \n");
             }
         }
     }

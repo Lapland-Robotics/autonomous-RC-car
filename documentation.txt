@@ -186,11 +186,30 @@
 	source https://medium.com/@bharathsudharsan023/jetson-nano-remote-vnc-access-d1e71c82492b
 
 6 Pilot
-	Install sudo apt-get install libncurses5-dev libncursesw5-dev
+  6.1 Install extra library
+	desktop:~/home/sdv/catkin_ws$ Install sudo apt-get install libncurses5-dev libncursesw5-dev
+ 
+7 Start robot
+  7.1 To use the robot place it on the track.
+  7.2 Start the program:
+	desktop:~/home/sdv/catkin_ws$ roslaunch launch autonomous_car.launch
+  7.3 It can happen that the ESC is not calibrated. This causes the vehicle not to move when the program is started.
+      However it will drive backwards when the program is closed.
+	  To solve this problem recalibrated the ESC.
+	 7.3.1 Press and hold the white button on the ESC until a beep sound can be heard.
+	 7.3.2 Press and hold the white button again until 2 beep sounds can be heard.
+	 7.3.3 Start the robot as described above.
+
+8 POC measure hight of object with camera and LiDAR.
+  8.1 With this program the hight and with of an object can be calculated.
+  8.2 To use the program place the LiDAR under the camera. Make sure the LiDAR and camera lens are aligned.
+  8.3 Start the program:
+	desktop:~/home/sdv/catkin_ws$ roslaunch launch height_measurement.launch
 
 
 
-Docker
+Docker 
+Not implemented in this project
 
 Solve permission denied
   .1 Create the docker group.
